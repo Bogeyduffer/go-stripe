@@ -59,7 +59,7 @@ func (app *application) renderTemplate(w http.ResponseWriter, r *http.Request, p
 		app.errorLog.Println(err)
 		return err
 	}
-
+ test change
 	return nil
 }
 
