@@ -8,17 +8,14 @@
     <h2 class="mt-3 text-center">Virtual Terminal</h2>
     <hr>
     <div class="alert alert-danger text-center d-none" id="card-messages"></div>
-    <form action="/payment-succeeded"
-          method="post"
-          name="charge_form"
-          id="charge_form"
+    <form action="/payment-succeeded" method="post"
+          name="charge_form" id="charge_form"
           class="d-block needs-validation charge-form"
-          autocomplete="off"
-          novalidate="">
+          autocomplete="off" novalidate="">
         <div class="mb-3">
             <label for="amount" class="form-label">Amount</label>
-            <input type="text" class="form-control" id="amount"
-                   name="amount" required="" autocomplete="amount-new">
+            <input type="text" class="form-control" id="amount" name="amount"
+                   required="" autocomplete="amount-new">
         </div>
         <div class="mb-3">
             <label for="cardholder-name" class="form-label">Cardholder Name</label>
@@ -45,6 +42,12 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
+
+        <input type="hidden" name="payment_intent" id="payment_intent">
+        <input type="hidden" name="payment_method" id="payment_method">
+        <input type="hidden" name="payment_amount" id="payment_amount">
+        <input type="hidden" name="payment_currency" id="payment_currency">
+
     </form>
 
 {{end}}
@@ -61,8 +64,8 @@
         stripe = Stripe('pk_test_6YAgGsFNw81GaNQFnsSb88AX')
 
         function hidePayButton() {
-            payButton.classList.add("d-none")
-            processing.classList.remove("d-none")
+            payButton.classList.add("d-none");
+            processing.classList.remove("d-none");
         }
 
         function val() {
@@ -73,12 +76,40 @@
                 form.classList.add("was-validated");
                 return;
             }
-            form.classList.add("was-validatad");
+            form.classList.add("was-validated");
             hidePayButton();
+
+            let amountToCharge = String(parseFloat(document.getElementById("amount").value) * 100)
+            let payload = {
+                amount: amountToCharge,
+                currency: 'cad',
+            }
+
+            const requestOptions = {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload),
+            }
+
+            fetch("http://localhost:4001/api/payment-intent", requestOptions)
+                .then(response => response.text())
+                .then(response => {
+                    let data;
+                    try {
+                        data = JSON.parse(response);
+                        console.log(data);
+                    } catch (err) {
+                        console.log(err);
+                    }
+                })
         }
 
         (function () {
             // create stripe & elements
+
             const elements = stripe.elements();
             const style = {
                 base: {
