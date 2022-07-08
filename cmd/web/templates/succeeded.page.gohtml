@@ -1,4 +1,4 @@
-{{template "base" .}}
+{{template "base" . }}
 
 {{define "title"}}
     Payment Succeeded!
@@ -7,11 +7,10 @@
 {{define "content"}}
     <h2 class="mt-5">Payment Succeeded</h2>
     <hr>
-        <p>Payment Intent: {{index .Data "pi"}}</p>
-        <p>Cardholder: {{index .Data "cardholder"}}</p>
-        <p>Email: {{index .Data "email"}}</p>
-        <p>Payment Method: {{index .Data "pm"}}</p>
-        <p>Payment Amount: {{index .Data "pa"}}</p>
-        <p>Currency: {{index .Data "pc"}}</p>
-
+    <p>Payment Intent: {{index .Data "pi"}}</p>
+    <p>Cardholder: {{index .Data "cardholder"}}</p>
+    <p>Email: {{index .Data "email"}}</p>
+    <p>Payment Method: {{index .Data "pm"}}</p>
+    <p>Payment Amount: {{index .Data "pa"}}</p>
+    <p>Currency: {{index .Data "pc"}}</p>
 {{end}}
