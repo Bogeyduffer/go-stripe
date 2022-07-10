@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/bogeyduffer/store-front/internal/driver"
+	"github.com/bogeyduffer/store-front/internal/models"
 	"log"
 	"net/http"
 	"os"
@@ -29,6 +30,7 @@ type application struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger
 	version  string
+	DB       models.DBModel
 }
 
 func (app *application) serve() error {
@@ -68,13 +70,14 @@ func main() {
 	}
 	defer conn.Close()
 
-	fmt.Println("---> Backend: onnected to database")
+	fmt.Println("---> Backend: connected to database")
 
 	app := &application{
 		config:   cfg,
 		infoLog:  infoLog,
 		errorLog: errorLog,
 		version:  version,
+		DB:       models.DBModel{DB: conn},
 	}
 
 	err = app.serve()
