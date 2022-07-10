@@ -71,11 +71,8 @@ func main() {
 	conn, err := driver.OpenDB(cfg.db.dsn)
 	if err != nil {
 		errorLog.Fatal(err)
-		return
 	}
 	defer conn.Close()
-
-	fmt.Println("---> Frontend connected to database")
 
 	tc := make(map[string]*template.Template)
 

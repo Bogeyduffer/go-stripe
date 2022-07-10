@@ -59,21 +59,22 @@ func (app *application) GetPaymentIntent(w http.ResponseWriter, r *http.Request)
 		w.Write(out)
 	} else {
 		j := jsonResponse{
-			OK:      false,
+			OK: false,
 			Message: msg,
 			Content: "",
 		}
-
+	
 		out, err := json.MarshalIndent(j, "", "   ")
 		if err != nil {
 			app.errorLog.Println(err)
 		}
-
+	
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(out)
 	}
 }
 
+// GetWidgetByID gets one widget by id and returns as JSON
 func (app *application) GetWidgetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	widgetID, _ := strconv.Atoi(id)
@@ -81,11 +82,13 @@ func (app *application) GetWidgetByID(w http.ResponseWriter, r *http.Request) {
 	widget, err := app.DB.GetWidget(widgetID)
 	if err != nil {
 		app.errorLog.Println(err)
+		return
 	}
 
 	out, err := json.MarshalIndent(widget, "", "   ")
 	if err != nil {
 		app.errorLog.Println(err)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

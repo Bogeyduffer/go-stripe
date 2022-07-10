@@ -66,18 +66,15 @@ func main() {
 	conn, err := driver.OpenDB(cfg.db.dsn)
 	if err != nil {
 		errorLog.Fatal(err)
-		return
 	}
 	defer conn.Close()
-
-	fmt.Println("---> Backend: connected to database")
 
 	app := &application{
 		config:   cfg,
 		infoLog:  infoLog,
 		errorLog: errorLog,
 		version:  version,
-		DB:       models.DBModel{DB: conn},
+		DB: models.DBModel{DB: conn},
 	}
 
 	err = app.serve()
