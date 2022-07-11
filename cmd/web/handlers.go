@@ -68,9 +68,8 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	customerID, err := app.SaveCustomer(firstName, lastName, email)
 	if err != nil {
 		app.errorLog.Println(err)
+		return
 	}
-
-	app.infoLog.Print(customerID)
 
 	// create a new transaction
 	amount, _ := strconv.Atoi(paymentAmount)
@@ -89,9 +88,8 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	txnID, err := app.SaveTransaction(txn)
 	if err != nil {
 		app.errorLog.Println(err)
+		return
 	}
-
-	app.infoLog.Print(txnID)
 
 	// create a new order
 	order := models.Order{
@@ -107,9 +105,8 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	_, err = app.SaveOrder(order)
 	if err != nil {
 		app.errorLog.Println(err)
+		return
 	}
-
-	app.infoLog.Print(txnID)
 
 	data := make(map[string]interface{})
 	data["email"] = email
@@ -125,8 +122,14 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	data["last_name"] = lastName
 
 	// should write this data to session, and then redirect user to new page
+	app.Session.Put(r.Context(), "receipt", data)
+	http.Redirect(w, r, "/receipt", http.StatusSeeOther)
+}
 
-	if err := app.renderTemplate(w, r, "succeeded", &templateData{
+func (app *application) Receipt(w http.ResponseWriter, r *http.Request) {
+	data := app.Session.Get(r.Context(), "receipt").(map[string]interface{})
+	app.Session.Remove(r.Context(), "receipt")
+	if err := app.renderTemplate(w, r, "receipt", &templateData{
 		Data: data,
 	}); err != nil {
 		app.errorLog.Println(err)
@@ -142,33 +145,27 @@ func (app *application) SaveCustomer(firstName, lastName, email string) (int, er
 	}
 
 	id, err := app.DB.InsertCustomer(customer)
-
 	if err != nil {
 		return 0, err
 	}
-
 	return id, nil
 }
 
 // SaveTransaction saves a txn and returns id
 func (app *application) SaveTransaction(txn models.Transaction) (int, error) {
 	id, err := app.DB.InsertTransaction(txn)
-
 	if err != nil {
 		return 0, err
 	}
-
 	return id, nil
 }
 
 // SaveOrder saves an order and returns id
 func (app *application) SaveOrder(order models.Order) (int, error) {
 	id, err := app.DB.InsertOrder(order)
-
 	if err != nil {
 		return 0, err
 	}
-
 	return id, nil
 }
 
