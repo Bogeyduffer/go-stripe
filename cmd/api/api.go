@@ -53,7 +53,7 @@ func main() {
 
 	flag.IntVar(&cfg.port, "port", 4001, "Server port to listen on")
 	flag.StringVar(&cfg.env, "env", "development", "Application environment {development|production|maintenance}")
-	flag.StringVar(&cfg.db.dsn, "dsn", "bob:secret@tcp(localhost:3306)/widgets?parseTime+trust&tls=false", "DSN")
+	flag.StringVar(&cfg.db.dsn, "dsn", "bob:secret@tcp(localhost:3306)/widgets?parseTime=true&tls=false", "DSN")
 
 	flag.Parse()
 
@@ -74,7 +74,7 @@ func main() {
 		infoLog:  infoLog,
 		errorLog: errorLog,
 		version:  version,
-		DB: models.DBModel{DB: conn},
+		DB:       models.DBModel{DB: conn},
 	}
 
 	err = app.serve()
