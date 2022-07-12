@@ -140,8 +140,8 @@ func (m *DBModel) InsertTransaction(txn Transaction) (int, error) {
 	stmt := `
 		insert into transactions
 			(amount, currency, last_four, bank_return_code, expiry_month, expiry_year,
-			 payment_intent, payment_method, 
-			  transaction_status_id, created_at, updated_at)
+				payment_intent, payment_method,
+			transaction_status_id, created_at, updated_at)
 		values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
 
