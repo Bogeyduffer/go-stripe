@@ -4,15 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"myapp/internal/cards"
-	"myapp/internal/models"
+	"github.com/bogeyduffer/store-front/internal/cards"
+	"github.com/bogeyduffer/store-front/internal/models"
+	"github.com/go-chi/chi/v5"
+	"github.com/stripe/stripe-go/v72"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/stripe/stripe-go/v72"
 )
 
 type stripePayload struct {
