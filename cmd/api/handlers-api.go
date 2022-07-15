@@ -2,14 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/bogeyduffer/store-front/internal/cards"
-	"github.com/bogeyduffer/store-front/internal/models"
-	"github.com/go-chi/chi/v5"
-	"github.com/stripe/stripe-go/v72"
+	"myapp/internal/cards"
+	"myapp/internal/models"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/stripe/stripe-go/v72"
 )
 
 type stripePayload struct {
@@ -117,7 +120,7 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 		return
 	}
 
-	app.infoLog.Println("--->", data.Email, data.LastFour, data.Plan, data.Plan)
+	app.infoLog.Println(data.Email, data.LastFour, data.PaymentMethod, data.Plan)
 
 	card := cards.Card{
 		Secret:   app.config.stripe.secret,
@@ -156,11 +159,11 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 		// create a new txn
 		amount, _ := strconv.Atoi(data.Amount)
-		//expiryMonth, _ := strconv.Atoi(data.ExpiryMonth)
-		//expiryYear, _ := strconv.Atoi(data.ExpiryYear)
+		// expiryMonth, _ := strconv.Atoi(data.ExpiryMonth)
+		// expiryYear, _ := strconv.Atoi(data.ExpiryYear)
 		txn := models.Transaction{
 			Amount:              amount,
-			Currency:            "USD",
+			Currency:            "cad",
 			LastFour:            data.LastFour,
 			ExpiryMonth:         data.ExpiryMonth,
 			ExpiryYear:          data.ExpiryYear,
@@ -173,7 +176,7 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 			return
 		}
 
-		//create order
+		// create order
 		order := models.Order{
 			WidgetID:      productID,
 			TransactionID: txnID,
@@ -190,7 +193,6 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 			app.errorLog.Println(err)
 			return
 		}
-
 	}
 
 	resp := jsonResponse{
@@ -232,7 +234,7 @@ func (app *application) SaveTransaction(txn models.Transaction) (int, error) {
 	return id, nil
 }
 
-// SaveOrder saves an order and returns id
+// SaveOrder saves a order and returns id
 func (app *application) SaveOrder(order models.Order) (int, error) {
 	id, err := app.DB.InsertOrder(order)
 	if err != nil {
@@ -300,6 +302,45 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 	_ = app.writeJSON(w, http.StatusOK, payload)
 }
 
+func (app *application) authenticateToken(r *http.Request) (*models.User, error) {
+	authorizationHeader := r.Header.Get("Authorization")
+	if authorizationHeader == "" {
+		return nil, errors.New("no authorization header received")
+	}
+
+	headerParts := strings.Split(authorizationHeader, " ")
+	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+		return nil, errors.New("no authorization header received")
+	}
+
+	token := headerParts[1]
+	if len(token) != 26 {
+		return nil, errors.New("authentication token wrong size")
+	}
+
+	// get the user from the tokens table
+	user, err := app.DB.GetUserForToken(token)
+	if err != nil {
+		return nil, errors.New("no matching user found")
+	}
+
+	return user, nil
+}
+
 func (app *application) CheckAuthentication(w http.ResponseWriter, r *http.Request) {
-	app.invalidCredentials(w)
+	// validate the token, and get associated user
+	user, err := app.authenticateToken(r)
+	if err != nil {
+		app.invalidCredentials(w)
+		return
+	}
+
+	// valid user
+	var payload struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+	payload.Error = false
+	payload.Message = fmt.Sprintf("authenticated user %s", user.Email)
+	app.writeJSON(w, http.StatusOK, payload)
 }
