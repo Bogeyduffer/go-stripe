@@ -318,19 +318,6 @@ func (app *application) authenticateToken(r *http.Request) (*models.User, error)
 		return nil, errors.New("authentication token wrong size")
 	}
 
-	//log.Println("Trying to get token from dB")
-	//// get the token from the tokens table
-	//dbToken, err := app.DB.GetTokenByTokenHash(token)
-	//if err != nil {
-	//	return nil, errors.New("cannot find related Token for validation")
-	//}
-	//
-	//log.Printf("Checking if token expiry has Expired")
-	//
-	//if time.Now().UTC().After(dbToken.Expiry) {
-	//	return nil, errors.New("token has expired")
-	//}
-
 	log.Println("Trying to get user info from token")
 	// get the user from the tokens table
 	user, err := app.DB.GetUserForToken(token)
