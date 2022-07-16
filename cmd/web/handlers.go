@@ -3,10 +3,11 @@ package main
 import (
 	"github.com/bogeyduffer/store-front/internal/cards"
 	"github.com/bogeyduffer/store-front/internal/models"
-	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/go-chi/chi/v5"
 )
 
 // Home displays the home page
@@ -157,7 +158,7 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, "/receipt", http.StatusSeeOther)
 }
 
-// VirtualTerminalPaymentSucceeded displays the receipt page
+// VirtualTerminalPaymentSucceeded displays the receipt page for virtual terminal transactions
 func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r *http.Request) {
 	txnData, err := app.GetTransactionData(r)
 	if err != nil {
@@ -297,4 +298,26 @@ func (app *application) LoginPage(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "login", &templateData{}); err != nil {
 		app.errorLog.Print(err)
 	}
+}
+
+func (app *application) PostLoginPage(w http.ResponseWriter, r *http.Request) {
+	app.Session.RenewToken(r.Context())
+
+	err := r.ParseForm()
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	id, err := app.DB.Authenticate(email, password)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	app.Session.Put(r.Context(), "userID", id)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

@@ -68,7 +68,7 @@
             <strong>Bank Return Code</strong>: <span id="bank-return-code"></span>
         </p>
         <p>
-            <a class="btn btn-primary" href="/virtual-terminal">
+            <a class="btn btn-primary" href="/admin/virtual-terminal">
                 Charge another card
             </a>
         </p>
@@ -89,6 +89,7 @@ document.getElementById("charge_amount").addEventListener("change", function(evt
     }
 })
 </script>
+
 
 <script src="https://js.stripe.com/v3/"></script>
 
@@ -165,18 +166,18 @@ document.getElementById("charge_amount").addEventListener("change", function(evt
                                 name: document.getElementById("cardholder-name").value,
                             }
                         }
-                    }).then(function (result) {
+                    }).then(function(result) {
                         if (result.error) {
                             // card declined, or something went wrong with the card
                             showCardError(result.error.message);
                             showPayButtons();
-                        } else if (result.paymentIntent) {
+                        } else if(result.paymentIntent) {
                             if (result.paymentIntent.status === "succeeded") {
                                 // we have charged the card
                                 processing.classList.add("d-none");
                                 showCardSuccess();
-                                {{/*}}document.getElementById("charge_form").submit();*/}}
-                                saveTransaction(result)
+                                {{/* document.getElementById("charge_form").submit(); */}}
+                                saveTransaction(result);
                             }
                         }
                     })
