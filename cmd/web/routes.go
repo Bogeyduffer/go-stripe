@@ -11,7 +11,7 @@ func (app *application) routes() http.Handler {
 
 	mux.Get("/", app.Home)
 
-	mux.Route("/admin", func(mux chi.Router){
+	mux.Route("/admin", func(mux chi.Router) {
 		mux.Use(app.Auth)
 		mux.Get("/virtual-terminal", app.VirtualTerminal)
 	})
@@ -29,6 +29,7 @@ func (app *application) routes() http.Handler {
 	// auth routes
 	mux.Get("/login", app.LoginPage)
 	mux.Post("/login", app.PostLoginPage)
+	mux.Get("/logout", app.Logout)
 
 	fileServer := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
