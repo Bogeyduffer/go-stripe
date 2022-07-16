@@ -74,7 +74,7 @@ func main() {
 		infoLog:  infoLog,
 		errorLog: errorLog,
 		version:  version,
-		DB:       models.DBModel{DB: conn},
+		DB: models.DBModel{DB: conn},
 	}
 
 	err = app.serve()

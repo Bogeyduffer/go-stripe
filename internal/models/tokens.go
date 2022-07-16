@@ -53,7 +53,6 @@ func (m *DBModel) InsertToken(t *Token, u User) error {
 		return err
 	}
 
-	// insert new token
 	stmt = `insert into tokens (user_id, name, email, token_hash, expiry, created_at, updated_at)
 			values (?, ?, ?, ?, ?, ?, ?)`
 
@@ -84,10 +83,10 @@ func (m *DBModel) GetUserForToken(token string) (*User, error) {
 	query := `
 	select
 		u.id, u.first_name, u.last_name, u.email
-	from 
+	from
 		users u
 		inner join tokens t on (u.id = t.user_id)
-	where 
+	where
 		t.token_hash = ?
 		and t.expiry > ?
 	`
