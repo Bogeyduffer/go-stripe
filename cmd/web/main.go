@@ -69,7 +69,7 @@ func main() {
 	flag.StringVar(&cfg.db.dsn, "dsn", "bob:secret@tcp(localhost:3306)/widgets?parseTime=true&tls=false", "DSN")
 	flag.StringVar(&cfg.api, "api", "http://localhost:4001", "URL to api")
 	flag.StringVar(&cfg.frontend, "frontend", "http://localhost:4000", "url to front end")
-	flag.StringVar(&cfg.secretkey, "secret", "adeefdad44fdsafdsa", "secret key")
+	flag.StringVar(&cfg.secretkey, "secret", "C20FF153DB949740513CF565E5F36191", "secret key")
 
 	flag.Parse()
 
