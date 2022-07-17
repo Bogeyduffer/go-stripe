@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/bogeyduffer/store-front/internal/cards"
+	"github.com/bogeyduffer/store-front/internal/encryption"
 	"github.com/bogeyduffer/store-front/internal/models"
 	"github.com/bogeyduffer/store-front/internal/urlsigner"
 	"net/http"
@@ -436,7 +437,7 @@ func (app *application) SendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 
 	link := fmt.Sprintf("%s/reset-password?email=%s", app.config.frontend, payload.Email)
 
-	sign := urlsigner.Signer {
+	sign := urlsigner.Signer{
 		Secret: []byte(app.config.secretkey),
 	}
 
@@ -478,7 +479,17 @@ func (app *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := app.DB.GetUserByEmail(payload.Email)
+	encyrptor := encryption.Encryption{
+		Key: []byte(app.config.secretkey),
+	}
+
+	realEmail, err := encyrptor.Decrypt(payload.Email)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	user, err := app.DB.GetUserByEmail(realEmail)
 	if err != nil {
 		app.badRequest(w, r, err)
 		return
