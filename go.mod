@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
+	github.com/alexedwards/scs/mysqlstore v0.0.0-20220528130143-d93ace5be94b // indirect
 	github.com/alexedwards/scs/v2 v2.5.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/cockroachdb/cockroach-go v2.0.1+incompatible // indirect
