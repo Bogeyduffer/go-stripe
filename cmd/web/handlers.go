@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/bogeyduffer/store-front/internal/cards"
 	"github.com/bogeyduffer/store-front/internal/models"
+	"github.com/bogeyduffer/store-front/internal/urlsigner"
 	"net/http"
 	"strconv"
 	"time"
@@ -336,4 +338,30 @@ func (app *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		app.errorLog.Print(err)
 	}
 
+}
+
+// ShowResetPassword shows the reset password page
+func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request) {
+	theURL := r.RequestURI
+	testURL := fmt.Sprintf("%s%s", app.config.frontend, theURL)
+
+	signer := urlsigner.Signer{
+		Secret: []byte(app.config.secretkey),
+	}
+
+	valid := signer.VerifyToken(testURL)
+
+	if !valid {
+		app.errorLog.Println("Invalid url - tampering detected")
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["email"] = r.URL.Query().Get("email")
+
+	if err := app.renderTemplate(w, r, "reset-password", &templateData{
+		Data: data,
+	}); err != nil {
+		app.errorLog.Print(err)
+	}
 }
