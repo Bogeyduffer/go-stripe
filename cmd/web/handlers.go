@@ -337,7 +337,6 @@ func (app *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "forgot-password", &templateData{}); err != nil {
 		app.errorLog.Print(err)
 	}
-
 }
 
 // ShowResetPassword shows the reset password page
