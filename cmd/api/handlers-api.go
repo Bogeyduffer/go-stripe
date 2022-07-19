@@ -161,8 +161,7 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 		// create a new txn
 		amount, _ := strconv.Atoi(data.Amount)
-		// expiryMonth, _ := strconv.Atoi(data.ExpiryMonth)
-		// expiryYear, _ := strconv.Atoi(data.ExpiryYear)
+
 		txn := models.Transaction{
 			Amount:              amount,
 			Currency:            "cad",
@@ -170,6 +169,8 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 			ExpiryMonth:         data.ExpiryMonth,
 			ExpiryYear:          data.ExpiryYear,
 			TransactionStatusID: 2,
+			PaymentIntent:       subscription.ID,
+			PaymentMethod:       data.PaymentMethod,
 		}
 
 		txnID, err := app.SaveTransaction(txn)
@@ -585,10 +586,17 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 
 	err = card.Refund(chargeToRefund.PaymentIntent, chargeToRefund.Amount)
 	if err != nil {
+		fmt.Printf("PaymentIntent: %v;  Amount: %v", chargeToRefund.PaymentIntent, chargeToRefund.Amount)
 		app.badRequest(w, r, err)
 		return
 	}
 
+	// update status in db
+	err = app.DB.UpdateOrderStatus(chargeToRefund.ID, 2)
+	if err != nil {
+		app.badRequest(w, r, errors.New("the charge was refunded, but the database could not be updated"))
+		return
+	}
 	var resp struct {
 		Error   bool   `json:"error"`
 		Message string `json:"message"`

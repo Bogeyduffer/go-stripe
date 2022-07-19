@@ -390,18 +390,18 @@ func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request
 // AllSales displays the all sales page
 func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "all-sales", &templateData{}); err != nil {
-		app.errorLog.Println(err)
+		app.errorLog.Print(err)
 	}
 }
 
-// AllSubscriptions displays the subscriptions page
+// AllSubscriptions shows all subscription page
 func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "all-subscriptions", &templateData{}); err != nil {
 		app.errorLog.Print(err)
 	}
 }
 
-// ShowSale displays the sale page
+// ShowSale shows one sale page
 func (app *application) ShowSale(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["title"] = "Sale"
@@ -413,7 +413,7 @@ func (app *application) ShowSale(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ShowSubscription displays the sale page
+// ShowSubscription shows one subscription page
 func (app *application) ShowSubscription(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["title"] = "Subscription"
