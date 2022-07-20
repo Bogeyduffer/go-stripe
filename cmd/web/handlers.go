@@ -328,7 +328,7 @@ func (app *application) PostLoginPage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// Logout displays the login page
+// Logout logs the user out
 func (app *application) Logout(w http.ResponseWriter, r *http.Request) {
 	app.Session.Destroy(r.Context())
 	app.Session.RenewToken(r.Context())
@@ -387,7 +387,7 @@ func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request
 	}
 }
 
-// AllSales displays the all sales page
+// AllSales shows the all sales page
 func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "all-sales", &templateData{}); err != nil {
 		app.errorLog.Print(err)
@@ -410,6 +410,7 @@ func (app *application) ShowSale(w http.ResponseWriter, r *http.Request) {
 	stringMap["refund-btn"] = "Refund Order"
 	stringMap["refunded-badge"] = "Refunded"
 	stringMap["refunded-msg"] = "Charge refunded"
+
 	if err := app.renderTemplate(w, r, "sale", &templateData{
 		StringMap: stringMap,
 	}); err != nil {
@@ -426,9 +427,24 @@ func (app *application) ShowSubscription(w http.ResponseWriter, r *http.Request)
 	stringMap["refund-btn"] = "Cancel Subscription"
 	stringMap["refunded-badge"] = "Cancelled"
 	stringMap["refunded-msg"] = "Subscription cancelled"
+
 	if err := app.renderTemplate(w, r, "sale", &templateData{
 		StringMap: stringMap,
 	}); err != nil {
+		app.errorLog.Print(err)
+	}
+}
+
+// AllUsers shows the all users page
+func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "all-users", &templateData{}); err != nil {
+		app.errorLog.Print(err)
+	}
+}
+
+// OneUser shows one admin user for add/edit/delete
+func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "one-user", &templateData{}); err != nil {
 		app.errorLog.Print(err)
 	}
 }
