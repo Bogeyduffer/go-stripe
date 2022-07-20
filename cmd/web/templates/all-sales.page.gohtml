@@ -22,40 +22,55 @@
 
         </tbody>
     </table>
-        <nav>
-            <ul id="paginator" class="pagination">
+    <nav>
+        <ul id="paginator" class="pagination">
 
-            </ul>
-        </nav>
+        </ul>
+    </nav>
 {{end}}
 
 {{define "js"}}
     <script>
         let currentPage = 1;
-        let pageSize = 3;
+        let pageSize = 5;
 
         function paginator(pages, curPage) {
             let p = document.getElementById("paginator")
 
-    let html = `<li class="page-item"><a href="#!" class="page-link pager" data-page="${curPage - 1}">&lt;</a></li>`;
+            let html = `<li class="page-item"><a href="#!" class="page-link pager" data-page="${curPage - 1}">&lt;</a></li>`;
 
-    for (var i = 0; i <= pages; i++) {
-        html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${i + 1}">${i + 1}</a></li>`;
-    }
+            for (var i = 0; i <= pages; i++) {
+                html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${i + 1}">${i + 1}</a></li>`;
+            }
 
-    html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${curPage + 1}">&gt;</a></li>`;
+            html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${curPage + 1}">&gt;</a></li>`;
 
-    p.innerHTML = html;
-}
+            p.innerHTML = html;
 
-function updateTable(ps, cp) {
-    let token = localStorage.getItem("token");
-    let tbody = document.getElementById("sales-table").getElementsByTagName("tbody")[0];
+            let pageBtns = document.getElementsByClassName("pager");
+            for (var j = 0; j < pageBtns.length; j++) {
+                pageBtns[j].addEventListener("click", function (evt) {
+                    let desiredPage = evt.target.getAttribute("data-page");
+                    console.log("clicked, and data-page is", desiredPage);
+                    if ((desiredPage > 0) && (desiredPage <= pages + 1)) {
+                        console.log("would go to page", desiredPage);
+                        updateTable(pageSize, desiredPage);
+                    }
+                })
+            }
+        }
+
+        function updateTable(ps, cp) {
+            let token = localStorage.getItem("token");
+            let tbody = document.getElementById("sales-table").getElementsByTagName("tbody")[0];
+            tbody.innerHTML = "";
 
             let body = {
-                page_size: ps,
-                page: cp,
+                page_size: parseInt(ps, 10),
+                page: parseInt(cp, 10),
             }
+
+            console.log("page size:", ps, "page", cp);
 
             const requestOptions = {
                 method: 'post',
@@ -102,7 +117,7 @@ function updateTable(ps, cp) {
                     } else {
                         let newRow = tbody.insertRow();
                         let newCell = newRow.insertCell();
-                        newCell.setAttribute("colspan", "4");
+                        newCell.setAttribute("colspan", "5");
                         newCell.innerHTML = "No data available";
                     }
                 })
@@ -110,7 +125,7 @@ function updateTable(ps, cp) {
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            updateTable(pageSize, currentPage)
+            updateTable(pageSize, currentPage);
         })
 
 
