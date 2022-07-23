@@ -40,19 +40,19 @@
         let id = window.location.pathname.split("/").pop();
         let messages = document.getElementById("messages");
 
-        function showError(msg) {
-            messages.classList.add("alert-danger");
-            messages.classList.remove("alert-success");
-            messages.classList.remove("d-none");
-            messages.innerText = {{index .StringMap "refunded-msg"}};
-        }
+function showError(msg) {
+    messages.classList.add("alert-danger");
+    messages.classList.remove("alert-success");
+    messages.classList.remove("d-none");
+    messages.innerText = msg;
+}
 
-        function showSuccess(msg) {
-            messages.classList.add("alert-success");
-            messages.classList.remove("alert-danger");
-            messages.classList.remove("d-none");
-            messages.innerText = {{index .StringMap "refunded-msg"}};
-        }
+function showSuccess(msg) {
+    messages.classList.add("alert-success");
+    messages.classList.remove("alert-danger");
+    messages.classList.remove("d-none");
+    messages.innerText = msg;
+}
 
         document.addEventListener("DOMContentLoaded", function () {
 
@@ -93,7 +93,7 @@
             let c = parseFloat(amount / 100);
             return c.toLocaleString("en-CA", {
                 style: 'currency',
-                currency: 'usd',
+                currency: 'USD',
             })
         }
 
@@ -131,7 +131,7 @@ document.getElementById("refund-btn").addEventListener("click", function(){
                 if (data.error) {
                     showError(data.message);
                 } else {
-                    showSuccess("Charge refunded");
+                    showSuccess("{{index .StringMap "refunded-msg"}}");
                     document.getElementById("refund-btn").classList.add("d-none");
                     document.getElementById("refunded").classList.remove("d-none");
                     document.getElementById("charged").classList.add("d-none");

@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"golang.org/x/crypto/bcrypt"
 	"io"
 	"net/http"
+	"os"
 )
 
 // writeJSON writes aribtrary data out as JSON
@@ -69,45 +69,14 @@ func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err e
 	return nil
 }
 
-func (app *application) invalidCredentials(w http.ResponseWriter) error {
-	var payload struct {
-		Error   bool   `json:"error"`
-		Message string `json:"message"`
-	}
-
-	payload.Error = true
-	payload.Message = "invalid authentication credentials"
-
-	err := app.writeJSON(w, http.StatusUnauthorized, payload)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (app *application) passwordMatches(hash, password string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	if err != nil {
-		switch {
-		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
-			return false, nil
-		default:
-			return false, err
+func (app *application) CreateDirIfNotExist(path string) error {
+	const mode = 0755
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err := os.Mkdir(path, mode)
+		if err != nil {
+			app.errorLog.Println(err)
+			return err
 		}
 	}
-
-	return true, nil
-}
-
-func (app *application) failedValidation(w http.ResponseWriter, r *http.Request, errors map[string]string) {
-	var payload struct {
-		Error   bool              `json:"error"`
-		Message string            `json:"message"`
-		Errors  map[string]string `json:"errors"`
-	}
-
-	payload.Error = true
-	payload.Message = "failed validation"
-	payload.Errors = errors
-	app.writeJSON(w, http.StatusUnprocessableEntity, payload)
+	return nil
 }

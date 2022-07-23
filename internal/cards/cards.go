@@ -53,7 +53,7 @@ func (c *Card) CreatePaymentIntent(currency string, amount int) (*stripe.Payment
 	return pi, "", nil
 }
 
-// GetPaymentMethod gets the payment method by payment intent id
+// GetPaymentMethod gets the payment method by payment intend id
 func (c *Card) GetPaymentMethod(s string) (*stripe.PaymentMethod, error) {
 	stripe.Key = c.Secret
 
@@ -137,6 +137,7 @@ func (c *Card) Refund(pi string, amount int) error {
 	return nil
 }
 
+// CancelSubscription cancels a subscription, by subscription id
 func (c *Card) CancelSubscription(subID string) error {
 	stripe.Key = c.Secret
 

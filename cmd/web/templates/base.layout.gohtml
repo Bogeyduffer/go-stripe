@@ -55,12 +55,11 @@
           </li>
           {{end}}
 
-
         </ul>
 
         {{if eq .IsAuthenticated 1}}
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li id="logout-link" class="nav-item">
+          <li id="login-link" class="nav-item">
             <a class="nav-link" href="/logout">Logout</a></li>
           </li>
         </ul>
@@ -70,7 +69,6 @@
               <a class="nav-link" href="/login">Login</a></li>
             </li>
           </ul>
-
         {{end}}
       </div>
     </div>
@@ -88,11 +86,41 @@
 
   <script>
 
-    function logout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("token_expiry");
-      location.href = "/logout";
+  {{if eq .IsAuthenticated 1}}
+  let socket;
+  
+  document.addEventListener("DOMContentLoaded", function() {
+    socket = new WebSocket("ws://localhost:4000/ws")
+
+    socket.onopen = () => {
+      console.log("Successfully connected to websockets");
     }
+
+    socket.onclose = event => { };
+
+    socket.onerror = error => { };
+
+    socket.onmessage = msg => {
+      let data = JSON.parse(msg.data);
+
+      switch (data.action) {
+        case "logout":
+          if (data.user_id === {{.UserID}}) {
+            logout();
+          }
+          break;
+        default:
+      }
+    }
+
+  })
+  {{end}}
+
+  function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("token_expiry");
+    location.href = "/logout";
+  }
 
     function checkAuth() {
       if (localStorage.getItem("token") === null) {

@@ -34,6 +34,7 @@ require (
 	github.com/gobuffalo/validate/v3 v3.3.2 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/gorilla/css v1.0.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -49,6 +50,8 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-sqlite3 v1.14.14 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.16 // indirect
+	github.com/phpdave11/gofpdf v1.4.2 // indirect
+	github.com/phpdave11/gofpdi v1.0.12 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect

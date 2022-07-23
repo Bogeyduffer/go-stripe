@@ -539,7 +539,7 @@ func (m *DBModel) GetAllSubscriptions() ([]*Order, error) {
 	return orders, nil
 }
 
-// GetAllSubscriptionsPaginated returns a slice of all subscriptions
+// GetAllSubscriptionsPaginated returns a slice of a subset of subscriptions
 func (m *DBModel) GetAllSubscriptionsPaginated(pageSize, page int) ([]*Order, int, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -608,8 +608,10 @@ func (m *DBModel) GetAllSubscriptionsPaginated(pageSize, page int) ([]*Order, in
 	}
 
 	query = `
-			select count(o.id)
-			from orders o 
+		select 
+			count(o.id)
+		from 
+			orders o
 			left join widgets w on (o.widget_id = w.id)
 		where
 			w.is_recurring = 1
@@ -684,6 +686,7 @@ func (m *DBModel) GetOrderByID(id int) (Order, error) {
 	return o, nil
 }
 
+// UpdateOrderStatus updates the status of order to supplied statusID by id
 func (m *DBModel) UpdateOrderStatus(id, statusID int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -698,6 +701,7 @@ func (m *DBModel) UpdateOrderStatus(id, statusID int) error {
 	return nil
 }
 
+// GetAllUsers returns a slice of all users
 func (m *DBModel) GetAllUsers() ([]*User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -738,6 +742,7 @@ func (m *DBModel) GetAllUsers() ([]*User, error) {
 	return users, nil
 }
 
+// GetOneUser returns one user by id
 func (m *DBModel) GetOneUser(id int) (User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -767,6 +772,7 @@ func (m *DBModel) GetOneUser(id int) (User, error) {
 	return u, nil
 }
 
+// EditUser edits an existing user
 func (m *DBModel) EditUser(u User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -794,6 +800,7 @@ func (m *DBModel) EditUser(u User) error {
 	return nil
 }
 
+// AddUser inserts a user into the database
 func (m *DBModel) AddUser(u User, hash string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -817,6 +824,7 @@ func (m *DBModel) AddUser(u User, hash string) error {
 	return nil
 }
 
+// DeleteUser deletes a user by id
 func (m *DBModel) DeleteUser(id int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -827,12 +835,12 @@ func (m *DBModel) DeleteUser(id int) error {
 	if err != nil {
 		return err
 	}
-	stmt := `delete from tokens where id = ?`
 
-	_, err := m.DB.ExecContext(ctx, stmt, id)
+	stmt = "delete from tokens where user_id = ?"
+	_, err = m.DB.ExecContext(ctx, stmt, id)
 	if err != nil {
 		return err
 	}
-	return nil
 
+	return nil
 }

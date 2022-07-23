@@ -22,6 +22,7 @@
 
         </tbody>
     </table>
+
     <nav>
         <ul id="paginator" class="pagination">
 
@@ -35,7 +36,7 @@
         let pageSize = 5;
 
         function paginator(pages, curPage) {
-            let p = document.getElementById("paginator")
+            let p = document.getElementById("paginator");
 
             let html = `<li class="page-item"><a href="#!" class="page-link pager" data-page="${curPage - 1}">&lt;</a></li>`;
 
@@ -51,9 +52,7 @@
             for (var j = 0; j < pageBtns.length; j++) {
                 pageBtns[j].addEventListener("click", function (evt) {
                     let desiredPage = evt.target.getAttribute("data-page");
-                    console.log("clicked, and data-page is", desiredPage);
                     if ((desiredPage > 0) && (desiredPage <= pages + 1)) {
-                        console.log("would go to page", desiredPage);
                         updateTable(pageSize, desiredPage);
                     }
                 })
@@ -69,8 +68,6 @@
                 page_size: parseInt(ps, 10),
                 page: parseInt(cp, 10),
             }
-
-            console.log("page size:", ps, "page", cp);
 
             const requestOptions = {
                 method: 'post',
@@ -130,7 +127,7 @@
 
 
         function formatCurrency(amount) {
-            let c = parseFloat(amount / 100);
+            let c = parseFloat(amount/100);
             return c.toLocaleString("en-US", {
                 style: "currency",
                 currency: "USD",

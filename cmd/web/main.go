@@ -4,8 +4,6 @@ import (
 	"encoding/gob"
 	"flag"
 	"fmt"
-	"github.com/alexedwards/scs/mysqlstore"
-	"github.com/alexedwards/scs/v2"
 	"github.com/bogeyduffer/store-front/internal/driver"
 	"github.com/bogeyduffer/store-front/internal/models"
 	"html/template"
@@ -13,6 +11,9 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 )
 
 const version = "1.0.0"
@@ -101,6 +102,8 @@ func main() {
 		DB:            models.DBModel{DB: conn},
 		Session:       session,
 	}
+
+	go app.ListenToWsChannel()
 
 	err = app.serve()
 	if err != nil {
