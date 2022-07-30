@@ -96,7 +96,7 @@
                         item = document.createTextNode(i.widget.name);
                         newCell.appendChild(item);
 
-                        let cur = formatCurrency(i.transaction.amount)
+                let cur = formatCurrency(i.transaction.amount);
                         newCell = newRow.insertCell();
                         item = document.createTextNode(cur+ "/month");
                         newCell.appendChild(item);

@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"net/http"
+	"runtime"
 )
 
 // writeJSON writes aribtrary data out as JSON
@@ -110,4 +112,15 @@ func (app *application) failedValidation(w http.ResponseWriter, r *http.Request,
 	payload.Message = "failed validation"
 	payload.Errors = errors
 	app.writeJSON(w, http.StatusUnprocessableEntity, payload)
+}
+
+func trace() {
+	const trace = true // (true or false)
+	if trace {
+		pc := make([]uintptr, 15)
+		n := runtime.Callers(2, pc)
+		frames := runtime.CallersFrames(pc[:n])
+		frame, _ := frames.Next()
+		fmt.Printf("%s:%d %s\n", frame.File, frame.Line, frame.Function)
+	}
 }

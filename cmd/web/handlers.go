@@ -297,7 +297,7 @@ func (app *application) SaveTransaction(txn models.Transaction) (int, error) {
 	return id, nil
 }
 
-// SaveOrder saves an order and returns id
+// SaveOrder saves a order and returns id
 func (app *application) SaveOrder(order models.Order) (int, error) {
 	id, err := app.DB.InsertOrder(order)
 	if err != nil {

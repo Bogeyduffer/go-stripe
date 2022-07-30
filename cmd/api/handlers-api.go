@@ -133,21 +133,26 @@ type Invoice struct {
 
 // CreateCustomerAndSubscribeToPlan is the handler for subscribing to the bronze plan
 func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, r *http.Request) {
+	trace()
 	var data stripePayload
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
+		trace()
 		app.errorLog.Println(err)
 		return
 	}
+	trace()
 
 	// validate data
 	v := validator.New()
 	v.Check(len(data.FirstName) > 1, "first_name", "must be at least 2 characters")
 
 	if !v.Valid() {
+		trace()
 		app.failedValidation(w, r, v.Errors)
 		return
 	}
+	trace()
 
 	card := cards.Card{
 		Secret:   app.config.stripe.secret,
@@ -161,14 +166,18 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 	stripeCustomer, msg, err := card.CreateCustomer(data.PaymentMethod, data.Email)
 	if err != nil {
+		trace()
 		app.errorLog.Println(err)
 		okay = false
 		txnMsg = msg
 	}
+	trace()
 
 	if okay {
+		trace()
 		subscription, err = card.SubscribeToPlan(stripeCustomer, data.Plan, data.Email, data.LastFour, "")
 		if err != nil {
+			trace()
 			app.errorLog.Println(err)
 			okay = false
 			txnMsg = "Error subscribing customer"
@@ -176,12 +185,15 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 	}
 
 	if okay {
+		trace()
 		productID, _ := strconv.Atoi(data.ProductID)
 		customerID, err := app.SaveCustomer(data.FirstName, data.LastName, data.Email)
 		if err != nil {
+			trace()
 			app.errorLog.Println(err)
 			return
 		}
+		trace()
 
 		// create a new txn
 		amount, _ := strconv.Atoi(data.Amount)
@@ -199,9 +211,11 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 		txnID, err := app.SaveTransaction(txn)
 		if err != nil {
+			trace()
 			app.errorLog.Println(err)
 			return
 		}
+		trace()
 
 		// create order
 		order := models.Order{
@@ -217,9 +231,11 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 		orderID, err := app.SaveOrder(order)
 		if err != nil {
+			trace()
 			app.errorLog.Println(err)
 			return
 		}
+		trace()
 
 		inv := Invoice{
 			ID:        orderID,
@@ -234,11 +250,12 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 		err = app.callInvoiceMicro(inv)
 		if err != nil {
-			fmt.Println("--- processing error after call to callInvoiceMicro")
-
+			trace()
 			app.errorLog.Println(err)
 		}
+		trace()
 	}
+	trace()
 
 	resp := jsonResponse{
 		OK:      okay,
@@ -247,10 +264,11 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 	out, err := json.MarshalIndent(resp, "", "  ")
 	if err != nil {
+		trace()
 		app.errorLog.Println(err)
 		return
 	}
-	fmt.Println("--- Setting header and writing out")
+	trace()
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
@@ -258,26 +276,32 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 // callInvoiceMicro calls the invoicing microservice
 func (app *application) callInvoiceMicro(inv Invoice) error {
-
-	fmt.Println("--- Executing callInvoiceMicro")
+	trace()
 	url := "http://localhost:5000/invoice/create-and-send"
 	out, err := json.MarshalIndent(inv, "", "\t")
 	if err != nil {
+		trace()
 		return err
 	}
+	trace()
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(out))
 	if err != nil {
+		trace()
 		return err
 	}
+	trace()
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		trace()
 		return err
 	}
+	trace()
 	defer resp.Body.Close()
+	trace()
 
 	return nil
 }
